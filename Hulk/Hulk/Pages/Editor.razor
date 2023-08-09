@@ -1,0 +1,28 @@
+﻿@page "/editor"
+@using Hulk.Data
+
+<PageTitle>Code Editor</PageTitle>
+
+<h1 class="header">Code Editor</h1>
+
+<div class="editor-container">
+    <textarea @bind="@Code" class="code-editor"></textarea>
+</div>
+
+<button class="compile-button" @onclick="CompileCode">Compile</button>
+
+<div class="output-container">
+    <h3>Output:</h3>
+    <pre class="output">@CompilationResult</pre>
+</div>
+
+@code {
+    private string Code { get; set; }
+    private string CompilationResult { get; set; }
+
+    private void CompileCode()
+    {
+        // Add your code compilation logic here
+        CompilationResult = "Code compiled successfully!";
+    }
+}

@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 25.0.1706.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hulk", "Hulk\Hulk.csproj", "{30F4E68F-2293-43BE-A672-4A3DEFAA50D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HulkPL", "HulkPL\HulkPL.csproj", "{4A0840CD-8929-4AB9-9179-C331D597B1FA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{30F4E68F-2293-43BE-A672-4A3DEFAA50D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30F4E68F-2293-43BE-A672-4A3DEFAA50D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30F4E68F-2293-43BE-A672-4A3DEFAA50D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30F4E68F-2293-43BE-A672-4A3DEFAA50D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A0840CD-8929-4AB9-9179-C331D597B1FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A0840CD-8929-4AB9-9179-C331D597B1FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A0840CD-8929-4AB9-9179-C331D597B1FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A0840CD-8929-4AB9-9179-C331D597B1FA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A6E59D15-85A5-475B-839F-E7AA8EA89441}
+	EndGlobalSection
+EndGlobal

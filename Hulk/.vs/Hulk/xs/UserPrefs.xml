@@ -1,0 +1,38 @@
+﻿<Properties StartupConfiguration="{30F4E68F-2293-43BE-A672-4A3DEFAA50D9}|https">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Hulk/Pages/Index.razor">
+    <Files>
+      <File FileName="Hulk/wwwroot/css/site.css" />
+      <File FileName="Hulk/Pages/Index.razor" Line="11" Column="1" />
+      <File FileName="Hulk/Pages/FetchData.razor" />
+      <File FileName="Hulk/Shared/NavMenu.razor" />
+      <File FileName="Hulk/Shared/MainLayout.razor" />
+      <File FileName="Hulk/_Imports.razor" />
+      <File FileName="Hulk/Program.cs" />
+      <File FileName="Hulk/appsettings.json" />
+      <File FileName="Hulk/Shared/SurveyPrompt.razor" />
+      <File FileName="Hulk/App.razor" />
+      <File FileName="Hulk/Properties/launchSettings.json" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Hulk" expanded="True">
+            <Node name="Hulk">
+              <Node name="Dependencies" expanded="True" selected="True" />
+              <Node name="Pages" expanded="True" />
+            </Node>
+            <Node name="HulkPL" expanded="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.ItemProperties.Hulk PreferredExecutionTarget="/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app" />
+  <MonoDevelop.Ide.ItemProperties.HulkPL FirstBuild="True" />
+  <MultiItemStartupConfigurations />
+</Properties>
