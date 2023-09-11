@@ -30,3 +30,6 @@
 /Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/obj/Debug/net7.0/Hulk.pdb
 /Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/obj/Debug/net7.0/Hulk.genruntimeconfig.cache
 /Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/obj/Debug/net7.0/ref/Hulk.dll
+/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/bin/Debug/net7.0/HulkPL.dll
+/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/bin/Debug/net7.0/HulkPL.pdb
+/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/obj/Debug/net7.0/Hulk.csproj.CopyComplete

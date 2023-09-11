@@ -1,5 +1,6 @@
 ﻿@page "/editor"
 @using Hulk.Data
+@using HulkPL
 
 <PageTitle>Code Editor</PageTitle>
 
@@ -22,7 +23,8 @@
 
     private void CompileCode()
     {
+        var result = Compiler.Compile(Code);
         // Add your code compilation logic here
-        CompilationResult = "Code compiled successfully!";
+        CompilationResult =result + "Code compiled successfully!";
     }
 }

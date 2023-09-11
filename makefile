@@ -4,4 +4,4 @@ build:
 
 .PHONY: dev
 dev:
-	dotnet watch run --project test111111
+	dotnet watch run --project Hulk/Hulk
