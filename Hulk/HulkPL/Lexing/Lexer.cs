@@ -7,7 +7,7 @@ class Lexer
 
 
     private static readonly Dictionary<TokenGroup, Regex> tokenRegexes = new Dictionary<TokenGroup, Regex> {
-        { TokenGroup.Keyword, new Regex(@"^(let|var|if|else|for|while|return|print|function|in)$") },
+        { TokenGroup.Keyword, new Regex(@"^(let|var|if|else|for|while|return|print|function|in|true|false)$") },
         {TokenGroup.VariablesTypes,new Regex(@"^(String|Number)$") },
         { TokenGroup.Variable, new Regex(@"^[_a-zA-Z][_a-zA-Z0-9]*$") },
         { TokenGroup.Operator, new Regex(@"^(\:|\;|\(|\)|\+|\-|\*|\/|\==|\!=|\=|\?|\,|\{|\}|\:\=|\>\=|\>)$") },
@@ -34,7 +34,7 @@ class Lexer
             if (tokenRegexes[TokenGroup.BadStringGroup].IsMatch(currentToken) && currentChar == "\"")
             {
 
-                tokens.Add(new Token(TokenType.StringToken, currentToken + currentChar));
+                tokens.Add(new Token(TokenType.StringToken, currentToken.Substring(1)));
                 currentToken = "";
                 continue;
             }

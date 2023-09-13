@@ -75,13 +75,48 @@ public class Parser
         {
             Token functionName = Consume(TokenType.IdentifierToken, "Expected function name after 'function' keyword.");
             Consume(TokenType.LeftParenthesisToken, "Expected '(' after function name.");
-            List<Token> parameters = new List<Token>();
+            List<VariableDeclarationNode> variables = new List<VariableDeclarationNode>();
             if (!Check(TokenType.RightParenthesisToken))
             {
                 do
                 {
-                    Token parameter = Consume(TokenType.IdentifierToken, "Expected parameter name.");
-                    parameters.Add(parameter);
+                    Node expr = ParseExpression();
+
+                    VariableType variableType = VariableType.Implicit;
+
+                    if (Check(TokenType.TwoDotsToken))
+                    {
+                        Advance();
+                        if (Check(TokenType.StringTypeToken))
+                        {
+                            variableType = VariableType.String;
+                            Advance();
+                        }
+                        else if (Check(TokenType.NumberTypeToken))
+                        {
+                            variableType = VariableType.Number;
+                            Advance();
+                        }
+                        else
+                        {
+                            throw new Exception("Expected variable type after : ");
+                        }
+                    }
+
+
+                    if (Match(TokenType.AssignmentToken))
+                    {
+                        Node right = ParseExpression();
+
+                        variables.Add(new VariableDeclarationNode(((VariableReferenceNode)expr).Name, right, variableType));
+                    }
+                    else
+                    {
+                        variables.Add(new VariableDeclarationNode(((VariableReferenceNode)expr).Name, null, variableType));
+                    }
+                    
+
+
                 } while (Match(TokenType.CommaToken));
             }
             Consume(TokenType.RightParenthesisToken, "Expected ')' after function parameters.");
@@ -108,8 +143,9 @@ public class Parser
                 }
             }
             Consume(TokenType.RightBraceToken, "Expected '}' after block.");
+
             Console.WriteLine(returnNode);
-            return new FunctionDeclarationNode(functionName.Value, parameters, body, returnNode);
+            return new FunctionDeclarationNode(functionName.Value, variables, body, returnNode);
         }
         else if (Match(TokenType.VarToken))
         {
@@ -182,7 +218,7 @@ public class Parser
                 {
                     Node right = ParseExpression();
 
-                    variables.Add(new VariableDeclarationNode(((VariableReferenceNode)expr).Name, right,variableType));
+                    variables.Add(new VariableDeclarationNode(((VariableReferenceNode)expr).Name, right, variableType));
                 }
                 else
                 {

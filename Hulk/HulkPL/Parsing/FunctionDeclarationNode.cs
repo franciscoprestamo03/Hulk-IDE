@@ -3,11 +3,11 @@ namespace HulkPL;
 public class FunctionDeclarationNode : Node
 {
     public string Name { get; }
-    public List<Token> Parameters { get; }
+    public List<VariableDeclarationNode> Parameters;
     public List<Node> Body { get; }
     public Node? ReturnNode { get; }
 
-    public FunctionDeclarationNode(string name, List<Token> parameters, List<Node> body, Node? returnNode)
+    public FunctionDeclarationNode(string name, List<VariableDeclarationNode> parameters, List<Node> body, Node? returnNode)
     {
         Name = name;
         Parameters = parameters;

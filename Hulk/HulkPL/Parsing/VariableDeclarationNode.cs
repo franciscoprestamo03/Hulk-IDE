@@ -3,11 +3,11 @@ namespace HulkPL;
 public class VariableDeclarationNode : Node
 {
     public string Name { get; }
-    public Node Initializer { get; }
+    public Node? Initializer ;
 
     public VariableType VarType { get; }
 
-    public VariableDeclarationNode(string name, Node initializer,VariableType type = VariableType.Implicit)
+    public VariableDeclarationNode(string name, Node? initializer,VariableType type = VariableType.Implicit)
     {
         Name = name;
         Initializer = initializer;

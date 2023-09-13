@@ -5,12 +5,16 @@ namespace HulkPL
     public class Evaluator
     {
         private Stack<Dictionary<string, object>> scopes;
+
+        private Stack<Dictionary<string, FunctionDeclarationNode>> functionScopes;
         private string output;
 
         public Evaluator()
         {
             this.scopes = new Stack<Dictionary<string, object>>();
             this.scopes.Push(new Dictionary<string, object>());
+            this.functionScopes = new Stack<Dictionary<string, FunctionDeclarationNode>>();
+            this.functionScopes.Push(new Dictionary<string, FunctionDeclarationNode>());
         }
 
         public string EvaluateMain(Node node){
@@ -46,6 +50,39 @@ namespace HulkPL
                     Console.WriteLine(value);
                     output += $"{value} \n";
                     return null;
+                case FunctionDeclarationNode functionDeclarationNode:
+                    if (functionScopes.Peek().ContainsKey(functionDeclarationNode.Name))
+                    {
+                        throw new Exception($"Function '{functionDeclarationNode.Name}' already exists.");
+                    }
+                    else
+                    {
+                        functionScopes.Peek().Add(functionDeclarationNode.Name, functionDeclarationNode);
+                        return null;
+                    }
+                case FunctionCallNode functionCallNode:
+                    if (FindFuntionScope(functionCallNode.Name) != null)
+                    {
+                        FunctionDeclarationNode function = FindFuntionScope(functionCallNode.Name)[functionCallNode.Name];
+                        EnterScope();
+                        if(function.Parameters.Count!=functionCallNode.Arguments.Count){
+                            throw new Exception($"Function requires exact {function.Parameters.Count} arguments");
+                        }
+                        for (int i = 0; i < function.Parameters.Count; i++)
+                        {
+                            VariableDeclarationNode variableDeclaration = function.Parameters[i];
+                            variableDeclaration.Initializer = functionCallNode.Arguments[i];
+                            Evaluate(variableDeclaration);
+                        }
+                        object result4 = EvaluateBlock(function.Body);
+
+                        ExitScope();
+                        return result4;
+                    }
+                    else
+                    {
+                        throw new Exception($"Function '{functionCallNode.Name}' does not exist.");
+                    }
                 case VariableReferenceNode variableReferenceNode:
                     if (FindVariableScope(variableReferenceNode.Name) != null)
                     {
@@ -63,6 +100,16 @@ namespace HulkPL
                     else
                     {
                         object initialValue = Evaluate(variableDeclarationNode.Initializer);
+
+                        //type cheking
+                        System.Console.WriteLine("verificando valor "+initialValue.GetType());
+
+                        if(variableDeclarationNode.VarType==VariableType.Implicit){
+                            if(initialValue.GetType()=="a".GetType()){
+                                
+                            }
+                        }
+
                         scopes.Peek().Add(variableDeclarationNode.Name, initialValue);
                         return null;
                     }
@@ -145,14 +192,39 @@ namespace HulkPL
             return null;
         }
 
+        private Dictionary<string, FunctionDeclarationNode> FindFuntionScope(string functionName)
+        {
+            foreach (Dictionary<string, FunctionDeclarationNode> scope in functionScopes)
+            {
+                if (scope.ContainsKey(functionName))
+                {
+                    return scope;
+                }
+            }
+
+            // If the variable is not found in the local scope,
+            // recursively search in the parent scope (the previous scope in the stack).
+            if (functionScopes.Count > 1)
+            {
+                functionScopes.Pop();
+                Dictionary<string, FunctionDeclarationNode> parentScope = FindFuntionScope(functionName);
+                functionScopes.Push(parentScope);
+                return parentScope;
+            }
+
+            return null;
+        }
+
         private void EnterScope()
         {
             this.scopes.Push(new Dictionary<string, object>());
+            this.functionScopes.Push(new Dictionary<string, FunctionDeclarationNode>());
         }
 
         private void ExitScope()
         {
             this.scopes.Pop();
+            this.functionScopes.Pop();
         }
 
         private object EvaluateBinaryExpression(BinaryExpressionNode node)
