@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 
 namespace HulkPL
 {
@@ -11,10 +12,17 @@ namespace HulkPL
 
         public Evaluator()
         {
+            output = "";
             this.scopes = new Stack<Dictionary<string, object>>();
             this.scopes.Push(new Dictionary<string, object>());
             this.functionScopes = new Stack<Dictionary<string, FunctionDeclarationNode>>();
             this.functionScopes.Push(new Dictionary<string, FunctionDeclarationNode>());
+
+            //declaring some of my natives functions of like sen(x) and cos(x) for the hulk example tan(x)
+            //List<VariableDeclarationNode> variablesExample = new List<VariableDeclarationNode>();
+            //variablesExample.Add(new VariableDeclarationNode("x",null));
+            //FunctionDeclarationNode sen = new FunctionDeclarationNode("sen",variablesExample,null, new NumberNode(Math.Sin(double.Parse(sen.Pa))));
+
         }
 
         public string EvaluateMain(Node node){
@@ -24,7 +32,7 @@ namespace HulkPL
 
             return output;
         }
-        public object Evaluate(Node node)
+        public object? Evaluate(Node node)
         {
             switch (node)
             {
@@ -46,13 +54,14 @@ namespace HulkPL
                 case BooleanNode booleanNode:
                     return booleanNode.Value;
                 case PrintNode printNode:
-                    object value = Evaluate(printNode.Expression);
+                    object? value = Evaluate(printNode.Expression);
                     Console.WriteLine(value);
                     output += $"{value} \n";
                     return null;
                 case FunctionDeclarationNode functionDeclarationNode:
                     if (functionScopes.Peek().ContainsKey(functionDeclarationNode.Name))
                     {
+                        output += $"Function '{functionDeclarationNode.Name}' already exists.";
                         throw new Exception($"Function '{functionDeclarationNode.Name}' already exists.");
                     }
                     else
@@ -61,11 +70,32 @@ namespace HulkPL
                         return null;
                     }
                 case FunctionCallNode functionCallNode:
-                    if (FindFuntionScope(functionCallNode.Name) != null)
+                    if(functionCallNode.Name == "sen"){
+                        var argument1 = Evaluate(functionCallNode.Arguments[0]);
+                        if(argument1 is Double){
+                            return Math.Sin((double)argument1);
+                        }
+                        else{
+                            output += $"Function sen(x) receive a double not a {argument1.GetType()}";
+                            throw new Exception($"Function sen(x) receive a double not a {argument1.GetType()}");
+                        }
+                    }
+                    else if(functionCallNode.Name == "cos"){
+                        var argument1 = Evaluate(functionCallNode.Arguments[0]);
+                        if(argument1 is Double){
+                            return Math.Cos((double)argument1);
+                        }
+                        else{
+                            output += $"Function cos(x) receive a double not a {argument1.GetType()}";
+                            throw new Exception($"Function cos(x) receive a double not a {argument1.GetType()}");
+                        }
+                    }
+                    else if (FindFuntionScope(functionCallNode.Name) != null)
                     {
                         FunctionDeclarationNode function = FindFuntionScope(functionCallNode.Name)[functionCallNode.Name];
                         EnterScope();
                         if(function.Parameters.Count!=functionCallNode.Arguments.Count){
+                            output += $"Function requires exact {function.Parameters.Count} arguments";
                             throw new Exception($"Function requires exact {function.Parameters.Count} arguments");
                         }
                         for (int i = 0; i < function.Parameters.Count; i++)
@@ -74,13 +104,15 @@ namespace HulkPL
                             variableDeclaration.Initializer = functionCallNode.Arguments[i];
                             Evaluate(variableDeclaration);
                         }
-                        object result4 = EvaluateBlock(function.Body);
-
+                        object? result4 =  function.Body != null ? EvaluateBlock(function.Body) : null;
+                        
+                        object? result5 = function.ReturnNode != null ? Evaluate(function.ReturnNode) : null;
                         ExitScope();
-                        return result4;
+                        return result5;
                     }
                     else
                     {
+                        output += $"Function '{functionCallNode.Name}' does not exist.";
                         throw new Exception($"Function '{functionCallNode.Name}' does not exist.");
                     }
                 case VariableReferenceNode variableReferenceNode:
@@ -90,11 +122,13 @@ namespace HulkPL
                     }
                     else
                     {
+                        output += $"Variable '{variableReferenceNode.Name}' does not exist.";
                         throw new Exception($"Variable '{variableReferenceNode.Name}' does not exist.");
                     }
                 case VariableDeclarationNode variableDeclarationNode:
                     if (scopes.Peek().ContainsKey(variableDeclarationNode.Name))
                     {
+                        output += $"Variable '{variableDeclarationNode.Name}' already exists.";
                         throw new Exception($"Variable '{variableDeclarationNode.Name}' already exists.");
                     }
                     else
@@ -116,17 +150,18 @@ namespace HulkPL
                 case VariableAssignmentNode variableAssignmentNode:
                     if (FindVariableScope(variableAssignmentNode.Name) != null)
                     {
-                        object valueToAssign = Evaluate(variableAssignmentNode.Value);
+                        object? valueToAssign = Evaluate(variableAssignmentNode.Value);
                         FindVariableScope(variableAssignmentNode.Name)[variableAssignmentNode.Name] = valueToAssign;
                         return null;
                     }
                     else
                     {
+                        output += $"Variable '{variableAssignmentNode.Name}' does not exist.";
                         throw new Exception($"Variable '{variableAssignmentNode.Name}' does not exist.");
                     }
 
                 case IfNode ifNode:
-                    object conditionValue = Evaluate(ifNode.Condition);
+                    object? conditionValue = Evaluate(ifNode.Condition);
                     if (conditionValue is bool conditionBool && conditionBool)
                     {
                         EnterScope();
@@ -146,7 +181,7 @@ namespace HulkPL
                         return null;
                     }
                 case WhileNode whileNode:
-                    object loopConditionValue = Evaluate(whileNode.Condition);
+                    object? loopConditionValue = Evaluate(whileNode.Condition);
                     while (loopConditionValue is bool loopConditionBool && loopConditionBool)
                     {
                         EnterScope();
@@ -165,6 +200,7 @@ namespace HulkPL
                     ExitScope();
                     return result3;
                 default:
+                    output += $"Unhandled node type: {node.GetType()}";
                     throw new Exception($"Unhandled node type: {node.GetType()}");
             }
         }
@@ -218,6 +254,7 @@ namespace HulkPL
         private void EnterScope()
         {
             this.scopes.Push(new Dictionary<string, object>());
+            //se puede eliminar para que todas las funciones que se declaren sean globales
             this.functionScopes.Push(new Dictionary<string, FunctionDeclarationNode>());
         }
 
@@ -245,6 +282,7 @@ namespace HulkPL
                     }
                     else
                     {
+                        output += $"Cannot add {left?.GetType().Name} and {right?.GetType().Name}";
                         throw new Exception($"Cannot add {left?.GetType().Name} and {right?.GetType().Name}");
                     }
                 case TokenType.SubtractionToken:
@@ -254,6 +292,7 @@ namespace HulkPL
                     }
                     else
                     {
+                        output += $"Cannot subtract {left?.GetType().Name} and {right?.GetType().Name}";
                         throw new Exception($"Cannot subtract {left?.GetType().Name} and {right?.GetType().Name}");
                     }
                 case TokenType.MultiplicationToken:
@@ -263,6 +302,7 @@ namespace HulkPL
                     }
                     else
                     {
+                        output += $"Cannot multiply {left?.GetType().Name} and {right?.GetType().Name}";
                         throw new Exception($"Cannot multiply {left?.GetType().Name} and {right?.GetType().Name}");
                     }
                 case TokenType.DivisionToken:
@@ -272,6 +312,7 @@ namespace HulkPL
                     }
                     else
                     {
+                        output += $"Cannot divide {left?.GetType().Name} and {right?.GetType().Name}";
                         throw new Exception($"Cannot divide {left?.GetType().Name} and {right?.GetType().Name}");
                     }
                 case TokenType.EqualityToken:
@@ -285,6 +326,7 @@ namespace HulkPL
                     }
                     else
                     {
+                        output += $"Cannot compare {left?.GetType().Name} and {right?.GetType().Name}";
                         throw new Exception($"Cannot compare {left?.GetType().Name} and {right?.GetType().Name}");
                     }
                 case TokenType.LessThanOrEqualToken:
@@ -294,6 +336,7 @@ namespace HulkPL
                     }
                     else
                     {
+                        output += $"Cannot compare {left?.GetType().Name} and {right?.GetType().Name}";
                         throw new Exception($"Cannot compare {left?.GetType().Name} and {right?.GetType().Name}");
                     }
                 case TokenType.GreaterThanToken:
@@ -303,6 +346,7 @@ namespace HulkPL
                     }
                     else
                     {
+                        output += $"Cannot compare {left?.GetType().Name} and {right?.GetType().Name}";
                         throw new Exception($"Cannot compare {left?.GetType().Name} and {right?.GetType().Name}");
                     }
                 case TokenType.GreaterThanOrEqualToken:
@@ -312,6 +356,7 @@ namespace HulkPL
                     }
                     else
                     {
+                        output += $"Cannot compare {left?.GetType().Name} and {right?.GetType().Name}";
                         throw new Exception($"Cannot compare {left?.GetType().Name} and {right?.GetType().Name}");
                     }
                 case TokenType.LogicalAndToken:
@@ -321,6 +366,7 @@ namespace HulkPL
                     }
                     else
                     {
+                        output += $"Cannot perform logical AND on {left?.GetType().Name} and {right?.GetType().Name}";
                         throw new Exception($"Cannot perform logical AND on {left?.GetType().Name} and {right?.GetType().Name}");
                     }
                 case TokenType.LogicalOrToken:
@@ -330,9 +376,11 @@ namespace HulkPL
                     }
                     else
                     {
+                        output += $"Cannot perform logical OR on {left?.GetType().Name} and {right?.GetType().Name}";
                         throw new Exception($"Cannot perform logical OR on {left?.GetType().Name} and {right?.GetType().Name}");
                     }
                 default:
+                    output += $"Unknown binary operator {node.Operator.Value}";
                     throw new Exception($"Unknown binary operator {node.Operator.Value}");
             }
         }
@@ -350,6 +398,7 @@ namespace HulkPL
                     }
                     else
                     {
+                        output += $"Cannot negate {operand?.GetType().Name}";
                         throw new Exception($"Cannot negate {operand?.GetType().Name}");
                     }
                 case TokenType.LogicalNotToken:
@@ -359,6 +408,7 @@ namespace HulkPL
                     }
                     else
                     {
+                        output += $"Cannot perform logical NOT on {operand?.GetType().Name}";
                         throw new Exception($"Cannot perform logical NOT on {operand?.GetType().Name}");
                     }
                 default:

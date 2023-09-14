@@ -30,7 +30,6 @@ namespace HulkPL
 
             Parser parser = new Parser(tokens);
             Node mainNode = parser.Parse();
-            
             Evaluator evaluator = new Evaluator();
             result = evaluator.EvaluateMain(mainNode);
 
