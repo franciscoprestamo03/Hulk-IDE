@@ -16,6 +16,8 @@ public class Parser
         {
             { TokenType.EqualityToken, 1 },
             { TokenType.InequalityToken, 1 },
+            { TokenType.LogicalAndToken,1},
+            { TokenType.LogicalOrToken,1},
             { TokenType.LessThanToken, 2 },
             { TokenType.LessThanOrEqualToken, 2 },
             { TokenType.GreaterThanToken, 2 },
@@ -32,7 +34,7 @@ public class Parser
         List<Node> statements = new List<Node>();
         while (!IsAtEnd())
         {
-            Node statement = ParseStatement();
+            Node? statement = ParseStatement();
 
             if (statement != null)
             {
@@ -207,10 +209,7 @@ public class Parser
 
                 } while (Match(TokenType.CommaToken));
             }
-            else
-            {
-                Consume(TokenType.LeftParenthesisToken, "Expected '(' after function name.");
-            }
+            
 
             Consume(TokenType.RightParenthesisToken, "Expected ')' after function parameters.");
 
@@ -266,14 +265,13 @@ public class Parser
                 else
                 {
                     Node? statement = ParseStatement();
-                    System.Console.WriteLine("statement " + statement);
+                    
                     if (statement != null)
                     {
                         body.Add(statement);
                     }
                     else
                     {
-                        System.Console.WriteLine("test2222222222222");
                         return null;
                     }
                 }
