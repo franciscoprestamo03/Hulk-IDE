@@ -7,14 +7,15 @@ class Lexer
 
 
     private static readonly Dictionary<TokenGroup, Regex> tokenRegexes = new Dictionary<TokenGroup, Regex> {
-        { TokenGroup.Keyword, new Regex(@"^(let|var|if|else|for|while|return|print|function|in|true|false)$") },
+        { TokenGroup.Keyword, new Regex(@"^(let|var|if|else|for|while|return|function|in|true|false)$") },
         {TokenGroup.VariablesTypes,new Regex(@"^(String|Number)$") },
         { TokenGroup.Variable, new Regex(@"^[_a-zA-Z][_a-zA-Z0-9]*$") },
-        { TokenGroup.Operator, new Regex(@"^(\:|\;|\(|\)|\+|\-|\*|\/|\==|\!=|\=|\?|\,|\{|\}|\:\=|\>\=|\>)$") },
+        { TokenGroup.Operator, new Regex(@"^(\:|\;|\(|\)|\+|\-|\*|\/|\==|\!=|\=|\?|\,|\{|\}|\:\=|\>\=|\>|\=\>|\|\||&&)$") },
         { TokenGroup.WhiteSpace, new Regex(@"^\s+$") },
         { TokenGroup.Number, new Regex(@"^\d+(\.\d+)?$") },
         { TokenGroup.StringGroup, new Regex(@"^"".*?""$") },
-        { TokenGroup.BadStringGroup,new Regex(@"^(""|"".*)$")}
+        { TokenGroup.BadStringGroup,new Regex(@"^(""|"".*)$")},
+
     };
 
     public static List<Token> Lex(string input)
@@ -150,8 +151,6 @@ class Lexer
                 return TokenType.LetToken;
             case "var":
                 return TokenType.VarToken;
-            case "print":
-                return TokenType.PrintToken;
             case "function":
                 return TokenType.FunctionToken;
             case "in":
@@ -212,6 +211,9 @@ class Lexer
                 return TokenType.LeftBraceToken;
             case "}":
                 return TokenType.RightBraceToken;
+            case "=>":
+                return TokenType.ArrowToken;
+
         }
         return TokenType.BadToken;
     }

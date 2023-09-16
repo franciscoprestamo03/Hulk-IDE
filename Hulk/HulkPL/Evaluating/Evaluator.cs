@@ -53,11 +53,6 @@ namespace HulkPL
                     return stringNode.Value;
                 case BooleanNode booleanNode:
                     return booleanNode.Value;
-                case PrintNode printNode:
-                    object? value = Evaluate(printNode.Expression);
-                    Console.WriteLine(value);
-                    output += $"{value} \n";
-                    return null;
                 case FunctionDeclarationNode functionDeclarationNode:
                     if (functionScopes.Peek().ContainsKey(functionDeclarationNode.Name))
                     {
@@ -70,7 +65,7 @@ namespace HulkPL
                         return null;
                     }
                 case FunctionCallNode functionCallNode:
-                    if(functionCallNode.Name == "sen"){
+                    if(functionCallNode.Name == "sin"){
                         var argument1 = Evaluate(functionCallNode.Arguments[0]);
                         if(argument1 is Double){
                             return Math.Sin((double)argument1);
@@ -89,6 +84,28 @@ namespace HulkPL
                             output += $"Function cos(x) receive a double not a {argument1.GetType()}";
                             throw new Exception($"Function cos(x) receive a double not a {argument1.GetType()}");
                         }
+                    }
+                    else if(functionCallNode.Name == "print"){
+                        object? value = null;
+                        foreach (Node argument in functionCallNode.Arguments)
+                        {
+                            value = Evaluate(argument);
+                            Console.Write("value => "+value);
+                            output += $"{value}";
+                            
+                        }
+                        return value;
+                    }
+                    else if(functionCallNode.Name == "printLine"){
+                        object? value = null;
+                        foreach (Node argument in functionCallNode.Arguments)
+                        {
+                            value = Evaluate(argument);
+                            Console.WriteLine("value => "+value);
+                            output += $"{value}\n";
+                            
+                        }
+                        return value;
                     }
                     else if (FindFuntionScope(functionCallNode.Name) != null)
                     {
@@ -138,11 +155,6 @@ namespace HulkPL
                         //type cheking
                         System.Console.WriteLine("verificando valor "+initialValue.GetType());
 
-                        if(variableDeclarationNode.VarType==VariableType.Implicit){
-                            if(initialValue.GetType()=="a".GetType()){
-                                
-                            }
-                        }
 
                         scopes.Peek().Add(variableDeclarationNode.Name, initialValue);
                         return null;
@@ -266,8 +278,8 @@ namespace HulkPL
 
         private object EvaluateBinaryExpression(BinaryExpressionNode node)
         {
-            object left = Evaluate(node.Left);
-            object right = Evaluate(node.Right);
+            object? left = Evaluate(node.Left);
+            object? right = Evaluate(node.Right);
 
             switch (node.Operator.Type)
             {

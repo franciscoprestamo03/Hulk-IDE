@@ -11,7 +11,8 @@ namespace HulkPL
     {
 
 
-        public static string Compile(string code){
+        public static string Compile(string code)
+        {
             string result = "";
 
             var tokens = Lexer.Lex(code);
@@ -28,8 +29,28 @@ namespace HulkPL
                 }
             }
 
+
+            System.Console.WriteLine("llamando parser");
             Parser parser = new Parser(tokens);
-            Node mainNode = parser.Parse();
+            MainProgramNode mainNode;
+            string parserError;
+            (mainNode,parserError) = parser.Parse();
+            System.Console.WriteLine("parser error: " + parserError);
+            if(parserError!=""){
+                return parserError;
+            }
+
+            // Create an instance of the TypeChecker class
+            System.Console.WriteLine("llamando typechecker");
+            TypeChecker typeChecker = new TypeChecker();
+
+            // Perform type checking on the root node and get the resulting type
+            string typingError = typeChecker.checkTypes(mainNode);
+            System.Console.WriteLine(typingError);
+            if(typingError!=""){
+                return typingError;
+            }
+            System.Console.WriteLine("llamando evaluator");
             Evaluator evaluator = new Evaluator();
             result = evaluator.EvaluateMain(mainNode);
 
