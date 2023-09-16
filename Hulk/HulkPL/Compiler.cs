@@ -11,10 +11,9 @@ namespace HulkPL
     {
 
 
-        public static string Compile(string code)
-        {
+        public static string Compile(string code){
             string result = "";
-            System.Console.WriteLine("aaaaaaa");
+
             var tokens = Lexer.Lex(code);
             foreach (var item in tokens)
             {
@@ -29,25 +28,10 @@ namespace HulkPL
                 }
             }
 
-
-            System.Console.WriteLine("llamando parser");
             Parser parser = new Parser(tokens);
-            MainProgramNode mainNode;
-            string parserError;
-            (mainNode, parserError) = parser.Parse();
-            System.Console.WriteLine("parser error: " + parserError);
-            if (parserError != "")
-            {
-                return parserError;
-            }
-
-            System.Console.WriteLine("llamando evaluator");
+            Node mainNode = parser.Parse();
             Evaluator evaluator = new Evaluator();
-            try{
-            result = evaluator.EvaluateMain(mainNode);}
-            catch(Exception ex){
-                return ex.Message;
-            }
+            result = evaluator.EvaluateMain(mainNode);
 
 
             return result;

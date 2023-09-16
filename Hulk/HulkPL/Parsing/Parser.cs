@@ -5,19 +5,15 @@ public class Parser
     private List<Token> tokens;
     private int currentTokenIndex;
     private Dictionary<TokenType, int> precedence;
-    private string error;
 
     public Parser(List<Token> tokens)
     {
-        this.error = "";
         this.tokens = tokens;
         this.currentTokenIndex = 0;
         this.precedence = new Dictionary<TokenType, int>
         {
             { TokenType.EqualityToken, 1 },
             { TokenType.InequalityToken, 1 },
-            { TokenType.LogicalAndToken,1},
-            { TokenType.LogicalOrToken,1},
             { TokenType.LessThanToken, 2 },
             { TokenType.LessThanOrEqualToken, 2 },
             { TokenType.GreaterThanToken, 2 },
@@ -29,122 +25,50 @@ public class Parser
         };
     }
 
-    public (MainProgramNode, string) Parse()
+    public Node Parse()
     {
         List<Node> statements = new List<Node>();
         while (!IsAtEnd())
         {
-            Node? statement = ParseStatement();
+            Node statement = ParseStatement();
 
             if (statement != null)
             {
                 statements.Add(statement);
             }
-            else
-            {
-                break;
-            }
         }
         MainProgramNode mainProgram = new MainProgramNode(statements);
-        string temp = "";
-
-        if (error != "")
-        {
-            temp = error;
-            error = "";
-
-        }
-
-        return (mainProgram, temp);
+        return mainProgram;
     }
 
-    private Node? ParseStatement()
+    private Node ParseStatement()
     {
-        System.Console.WriteLine("llamada a parse statement");
         if (Match(TokenType.PrintToken))
         {
-
-            Node? expr = ParseExpression();
-            //Consume(TokenType.SemicolonToken, "Expected ';' after expression.");
-            if (expr != null)
-            {
-                return new PrintNode(expr);
-            }
-            return null;
+            Node expr = ParseExpression();
+            Consume(TokenType.SemicolonToken, "Expected ';' after expression.");
+            return new PrintNode(expr);
         }
         else if (Match(TokenType.IfToken))
         {
-            Node? condition = ParseExpression();
-            if (condition == null)
-            {
-                return null;
-            }
-
-            List<Node>? thenStatements = new List<Node>();
-
-            if (Check(TokenType.LeftBraceToken))
-            {
-                Consume(TokenType.LeftBraceToken, "Expected '{' after if condition.");
-                thenStatements = ParseBlock();
-                if (thenStatements == null)
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                Node? exp = ParseExpression();
-                if (exp == null)
-                {
-                    return null;
-                }
-                thenStatements.Add(exp);
-            }
-
-            List<Node>? elseStatements = null;
+            Node condition = ParseExpression();
+            Consume(TokenType.LeftBraceToken, "Expected '{' after if condition.");
+            List<Node> thenStatements = ParseBlock();
+            List<Node> elseStatements = null;
 
             if (Match(TokenType.ElseToken))
             {
-                if (Check(TokenType.LeftBraceToken))
-                {
-                    Consume(TokenType.LeftBraceToken, "Expected '{' after else keyword.");
-                    elseStatements = ParseBlock();
-                    if (elseStatements == null)
-                    {
-                        return null;
-                    }
-                }
-                else
-                {
-                    elseStatements = new List<Node>();
-                    Node? exp = ParseExpression();
-                    if (exp != null)
-                    {
-                        elseStatements.Add(exp);
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-
+                Consume(TokenType.LeftBraceToken, "Expected '{' after else keyword.");
+                elseStatements = ParseBlock();
             }
 
             return new IfNode(condition, thenStatements, elseStatements);
         }
         else if (Match(TokenType.WhileToken))
         {
-            Node? condition = ParseExpression();
-            if (condition == null)
-            {
-                return null;
-            }
+            Node condition = ParseExpression();
             Consume(TokenType.LeftBraceToken, "Expected '{' after while condition.");
-            List<Node>? bodyStatements = ParseBlock();
-            if (bodyStatements == null)
-            {
-                return null;
-            }
+            List<Node> bodyStatements = ParseBlock();
             return new WhileNode(condition, bodyStatements);
         }
         else if (Match(TokenType.FunctionToken))
@@ -156,91 +80,46 @@ public class Parser
             {
                 do
                 {
-                    Node? expr = ParseExpression();
-                    if (expr == null)
-                    {
-                        return null;
-                    }
+                    Node expr = ParseExpression();
 
-                    Type variableType1 = null;
+                    VariableType variableType = VariableType.Implicit;
 
                     if (Check(TokenType.TwoDotsToken))
                     {
                         Advance();
                         if (Check(TokenType.StringTypeToken))
                         {
-                            variableType1 = typeof(string);
+                            variableType = VariableType.String;
                             Advance();
                         }
                         else if (Check(TokenType.NumberTypeToken))
                         {
-                            variableType1 = typeof(double);
+                            variableType = VariableType.Number;
                             Advance();
                         }
                         else
                         {
-                            AddError("Expected variable type after : ");
-                            return null;
+                            throw new Exception("Expected variable type after : ");
                         }
-                    }
-                    else
-                    {
-                        AddError("Expected ':' ");
-                        return null;
                     }
 
 
                     if (Match(TokenType.AssignmentToken))
                     {
-                        Node? right = ParseExpression();
-                        if (right == null)
-                        {
-                            return null;
-                        }
+                        Node right = ParseExpression();
 
-                        variables.Add(new VariableDeclarationNode(((VariableReferenceNode)expr).Name, right, variableType1));
+                        variables.Add(new VariableDeclarationNode(((VariableReferenceNode)expr).Name, right, variableType));
                     }
                     else
                     {
-                        variables.Add(new VariableDeclarationNode(((VariableReferenceNode)expr).Name, null, variableType1));
+                        variables.Add(new VariableDeclarationNode(((VariableReferenceNode)expr).Name, null, variableType));
                     }
-
+                    
 
 
                 } while (Match(TokenType.CommaToken));
             }
-            
-
             Consume(TokenType.RightParenthesisToken, "Expected ')' after function parameters.");
-
-            Consume(TokenType.TwoDotsToken, "Expected ':' after function parameters for indicate return type.");
-            Type variableType = null;
-            if (Check(TokenType.StringTypeToken))
-            {
-                variableType = typeof(string);
-                Advance();
-            }
-            else if (Check(TokenType.NumberTypeToken))
-            {
-                variableType = typeof(double);
-                Advance();
-            }
-            else
-            {
-                AddError("Expected variable type after : ");
-                return null;
-            }
-
-            if (Match(TokenType.ArrowToken))
-            {
-                Node? returnNode2 = ParseExpression();
-                if (returnNode2 == null)
-                {
-                    return null;
-                }
-                Consume(TokenType.SemicolonToken, "Expected ';' after return statement.");
-                return new FunctionDeclarationNode(functionName.Value, variables, null, returnNode2, variableType);
-            }
             Consume(TokenType.LeftBraceToken, "Expected '{' before function body.");
 
 
@@ -252,82 +131,56 @@ public class Parser
                 if (Check(TokenType.ReturnToken))
                 {
                     Advance();
-                    Node? returnValue = ParseExpression();
-                    System.Console.WriteLine(returnValue);
-                    if (returnValue == null)
-                    {
-                        return null;
-                    }
+                    Node returnValue = ParseExpression();
                     Consume(TokenType.SemicolonToken, "Expected ';' after return statement.");
                     returnNode = returnValue;
                     break;
                 }
-                else
+                Node statement = ParseStatement();
+                if (statement != null)
                 {
-                    Node? statement = ParseStatement();
-                    
-                    if (statement != null)
-                    {
-                        body.Add(statement);
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    body.Add(statement);
                 }
-
             }
-            System.Console.WriteLine("test3333333333");
             Consume(TokenType.RightBraceToken, "Expected '}' after block.");
 
             Console.WriteLine(returnNode);
-            return new FunctionDeclarationNode(functionName.Value, variables, body, returnNode, variableType);
+            return new FunctionDeclarationNode(functionName.Value, variables, body, returnNode);
         }
         else if (Match(TokenType.VarToken))
         {
             Token identifier = Consume(TokenType.IdentifierToken, "Expected variable name after 'var' keyword.");
-            Type variableType2 = null;
+            VariableType variableType = VariableType.Implicit;
 
             if (Check(TokenType.TwoDotsToken))
             {
                 Advance();
                 if (Check(TokenType.StringTypeToken))
                 {
-                    variableType2 = typeof(string);
+                    variableType = VariableType.String;
                     Advance();
                 }
                 else if (Check(TokenType.NumberTypeToken))
                 {
-                    variableType2 = typeof(double);
+                    variableType = VariableType.Number;
                     Advance();
                 }
                 else
                 {
-                    AddError("Expected variable type after : ");
-                    return null;
-
+                    throw new Exception("Expected variable type after : ");
                 }
-            }
-            else
-            {
-                AddError("Expected ':' ");
-                return null;
             }
 
             if (Match(TokenType.AssignmentToken))
             {
-                Node? initializer = ParseExpression();
-                if (initializer == null)
-                {
-                    return null;
-                }
+                Node initializer = ParseExpression();
                 Consume(TokenType.SemicolonToken, "Expected ';' after variable declaration.");
-                return new VariableDeclarationNode(identifier.Value, initializer, variableType2);
+                return new VariableDeclarationNode(identifier.Value, initializer, variableType);
             }
             else
             {
                 Consume(TokenType.SemicolonToken, "Expected ';' after variable declaration.");
-                return new VariableDeclarationNode(identifier.Value, new NumberNode(0), variableType2);
+                return new VariableDeclarationNode(identifier.Value, new NumberNode(0), variableType);
             }
         }
         else if (Match(TokenType.LetToken))
@@ -337,93 +190,65 @@ public class Parser
 
             do
             {
-                Node? expr = ParseExpression();
-                if (expr == null)
-                {
-                    return null;
-                }
+                Node expr = ParseExpression();
 
-                Type variableType = null;
+                VariableType variableType = VariableType.Implicit;
 
                 if (Check(TokenType.TwoDotsToken))
                 {
                     Advance();
                     if (Check(TokenType.StringTypeToken))
                     {
-                        variableType = typeof(string);
+                        variableType = VariableType.String;
                         Advance();
                     }
                     else if (Check(TokenType.NumberTypeToken))
                     {
-                        variableType = typeof(double);
+                        variableType = VariableType.Number;
                         Advance();
                     }
                     else
                     {
-                        AddError("Expected variable type after : ");
-                        return null;
+                        throw new Exception("Expected variable type after : ");
                     }
                 }
 
 
                 if (Match(TokenType.AssignmentToken))
                 {
-
-                    Node? right = ParseExpression();
-                    if (right == null)
-                    {
-                        return null;
-                    }
+                    Node right = ParseExpression();
 
                     variables.Add(new VariableDeclarationNode(((VariableReferenceNode)expr).Name, right, variableType));
                 }
                 else
                 {
-                    AddError("Expected assignation value after variable");
-                    return null;
+                    throw new Exception("Expected assignation value after variable");
                 }
-
+                /*
+                if (Match(TokenType.AssignmentToken))
+                {
+                    Node initializer = ParseExpression();
+                    initializers.Add(initializer);
+                }
+                */
 
 
             } while (Match(TokenType.CommaToken));
 
             Consume(TokenType.InToken, "Expected 'in' keyword after let bindings.");
+            Consume(TokenType.LeftBraceToken, "Expected '{' after while condition.");
+            List<Node> body = ParseBlock();
 
-            List<Node> body = new List<Node>();
 
-            if (Check(TokenType.LeftBraceToken))
-            {
-                Consume(TokenType.LeftBraceToken, "Expected '{' after while condition.");
-                body = ParseBlock();
-            }
-            else
-            {
-                Node? expresion = ParseExpression();
-                if (expresion == null)
-                {
-                    return null;
-                }
-                body.Add(expresion);
-                Consume(TokenType.SemicolonToken, "Expected ';' after variable assignment.");
-            }
 
             return new LetNode(variables, body);
         }
         else
         {
-            Node? expr = ParseExpression();
-            if (expr == null)
-            {
-                return null;
-            }
+            Node expr = ParseExpression();
             if (Match(TokenType.AssignmentTwoDotsToken))
             {
-                Node? right = ParseExpression();
-                if (right == null)
-                {
-                    return null;
-                }
-
+                Node right = ParseExpression();
                 Consume(TokenType.SemicolonToken, "Expected ';' after variable assignment.");
                 return new VariableAssignmentNode(((VariableReferenceNode)expr).Name, right);
             }
@@ -435,39 +260,31 @@ public class Parser
         }
     }
 
-    private List<Node>? ParseBlock()
+    private List<Node> ParseBlock()
     {
         List<Node> statements = new List<Node>();
         while (!Check(TokenType.RightBraceToken) && !IsAtEnd())
         {
-            Node? statement = ParseStatement();
+            Node statement = ParseStatement();
             if (statement != null)
             {
                 statements.Add(statement);
-            }
-            else
-            {
-                return null;
             }
         }
         Consume(TokenType.RightBraceToken, "Expected '}' after block.");
         return statements;
     }
 
-    private Node? ParseExpression()
+    private Node ParseExpression()
     {
         return ParseBinaryExpression(0);
     }
 
 
 
-    private Node? ParseBinaryExpression(int minPrecedence)
+    private Node ParseBinaryExpression(int minPrecedence)
     {
-        Node? left = ParseUnaryExpression();
-        if (left == null)
-        {
-            return null;
-        }
+        Node left = ParseUnaryExpression();
         while (true)
         {
             Token operator1 = Peek();
@@ -477,26 +294,18 @@ public class Parser
                 break;
             }
             Advance();
-            Node? right = ParseBinaryExpression(precedence[operatorType] + 1);
-            if (right == null)
-            {
-                return null;
-            }
+            Node right = ParseBinaryExpression(precedence[operatorType] + 1);
             left = new BinaryExpressionNode(left, operator1, right);
         }
         return left;
     }
 
-    private Node? ParseUnaryExpression()
+    private Node ParseUnaryExpression()
     {
         if (Match(TokenType.SubtractionToken))
         {
             Token op = Previous();
-            Node? expr = ParseUnaryExpression();
-            if (expr == null)
-            {
-                return null;
-            }
+            Node expr = ParseUnaryExpression();
             return new UnaryExpressionNode(op, expr);
         }
         else
@@ -505,76 +314,9 @@ public class Parser
         }
     }
 
-    private Node? ParsePrimaryExpression()
+    private Node ParsePrimaryExpression()
     {
-        if (Match(TokenType.PrintToken))
-        {
-            Node? expr = ParseExpression();
-            if (expr == null)
-            {
-                return null;
-            }
-            //Consume(TokenType.SemicolonToken, "Expected ';' after expression.");
-            return new PrintNode(expr);
-        }
-        else if (Match(TokenType.IfToken))
-        {
-            Node? condition = ParseExpression();
-            if (condition == null)
-            {
-                return null;
-            }
-            List<Node>? thenStatements = new List<Node>();
-
-            if (Check(TokenType.LeftBraceToken))
-            {
-                Consume(TokenType.LeftBraceToken, "Expected '{' after if condition.");
-                thenStatements = ParseBlock();
-                if (thenStatements == null)
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                Node? exp = ParseExpression();
-                if (exp == null)
-                {
-                    return null;
-                }
-                thenStatements.Add(exp);
-            }
-
-            List<Node>? elseStatements = null;
-
-            if (Match(TokenType.ElseToken))
-            {
-                if (Check(TokenType.LeftBraceToken))
-                {
-                    Consume(TokenType.LeftBraceToken, "Expected '{' after else keyword.");
-                    elseStatements = ParseBlock();
-                    if (elseStatements == null)
-                    {
-                        return null;
-                    }
-                }
-                else
-                {
-                    elseStatements = new List<Node>();
-                    Node? exp = ParseExpression();
-                    if (exp == null)
-                    {
-                        return null;
-                    }
-                    elseStatements.Add(exp);
-                }
-
-            }
-
-            return new IfNode(condition, thenStatements, elseStatements);
-        }
-
-        else if (Match(TokenType.FalseToken))
+        if (Match(TokenType.FalseToken))
         {
             return new BooleanNode(false);
         }
@@ -596,11 +338,7 @@ public class Parser
                 {
                     do
                     {
-                        Node? argument = ParseExpression();
-                        if (argument == null)
-                        {
-                            return null;
-                        }
+                        Node argument = ParseExpression();
                         arguments.Add(argument);
                     } while (Match(TokenType.CommaToken));
                 }
@@ -614,12 +352,8 @@ public class Parser
         }
         else if (Match(TokenType.LeftParenthesisToken))
         {
-            Node? expr = ParseExpression();
-            if (expr == null)
-            {
-                return null;
-            }
-            Consume(TokenType.RightParenthesisToken, "Expected ')' after expression. " + Peek().Type + "value " + Peek().Value);
+            Node expr = ParseExpression();
+            Consume(TokenType.RightParenthesisToken, "Expected ')' after expression.");
             return new GroupingNode(expr);
         }
         else if (Match(TokenType.StringToken))
@@ -628,8 +362,7 @@ public class Parser
         }
         else
         {
-            AddError("Expected expression." + Peek().Type);
-            return null;
+            throw new Exception("Expected expression." + Peek().Type);
         }
     }
 
@@ -641,9 +374,7 @@ public class Parser
         }
         else
         {
-            AddError(errorMessage);
-            return null;
-
+            throw new Exception(errorMessage);
         }
     }
 
@@ -694,14 +425,6 @@ public class Parser
     private Token Previous()
     {
         return tokens[currentTokenIndex - 1];
-    }
-
-    private void AddError(string message)
-    {
-        if (error == "")
-        {
-            error = message;
-        }
     }
 }
 
