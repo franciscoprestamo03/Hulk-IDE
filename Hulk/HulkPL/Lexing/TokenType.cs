@@ -63,5 +63,6 @@ namespace HulkPL
         NumberTypeToken,
         TwoDotsToken,
         AssignmentTwoDotsToken,
+        ArrowToken,
     }
 }

@@ -14,6 +14,8 @@ public class Parser
         {
             { TokenType.EqualityToken, 1 },
             { TokenType.InequalityToken, 1 },
+            { TokenType.LogicalAndToken,1},
+            { TokenType.LogicalOrToken,1},
             { TokenType.LessThanToken, 2 },
             { TokenType.LessThanOrEqualToken, 2 },
             { TokenType.GreaterThanToken, 2 },
@@ -51,18 +53,58 @@ public class Parser
         }
         else if (Match(TokenType.IfToken))
         {
-            Node condition = ParseExpression();
-            Consume(TokenType.LeftBraceToken, "Expected '{' after if condition.");
-            List<Node> thenStatements = ParseBlock();
-            List<Node> elseStatements = null;
+            Node? condition = ParseExpression();
+            if (condition == null)
+            {
+                return null;
+            }
+            List<Node>? thenStatements = new List<Node>();
+
+            if (Check(TokenType.LeftBraceToken))
+            {
+                Consume(TokenType.LeftBraceToken, "Expected '{' after if condition.");
+                thenStatements = ParseBlock();
+                if (thenStatements == null)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                Node? exp = ParseExpression();
+                if (exp == null)
+                {
+                    return null;
+                }
+                thenStatements.Add(exp);
+            }
+
+            List<Node>? elseStatements = null;
 
             if (Match(TokenType.ElseToken))
             {
-                Consume(TokenType.LeftBraceToken, "Expected '{' after else keyword.");
-                elseStatements = ParseBlock();
+                if (Check(TokenType.LeftBraceToken))
+                {
+                    Consume(TokenType.LeftBraceToken, "Expected '{' after else keyword.");
+                    elseStatements = ParseBlock();
+                    if (elseStatements == null)
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    elseStatements = new List<Node>();
+                    Node? exp = ParseExpression();
+                    if (exp == null)
+                    {
+                        return null;
+                    }
+                    elseStatements.Add(exp);
+                }
             }
-
             return new IfNode(condition, thenStatements, elseStatements);
+
         }
         else if (Match(TokenType.WhileToken))
         {
@@ -114,12 +156,20 @@ public class Parser
                     {
                         variables.Add(new VariableDeclarationNode(((VariableReferenceNode)expr).Name, null, variableType));
                     }
-                    
+
 
 
                 } while (Match(TokenType.CommaToken));
             }
             Consume(TokenType.RightParenthesisToken, "Expected ')' after function parameters.");
+            if (Match(TokenType.ArrowToken))
+            {
+                Node returnNode2 = ParseExpression();
+                Consume(TokenType.SemicolonToken, "Expected ';' after return statement.");
+                return new FunctionDeclarationNode(functionName.Value, variables, null, returnNode2);
+            }
+
+
             Consume(TokenType.LeftBraceToken, "Expected '{' before function body.");
 
 
@@ -316,7 +366,63 @@ public class Parser
 
     private Node ParsePrimaryExpression()
     {
-        if (Match(TokenType.FalseToken))
+        if (Match(TokenType.IfToken))
+        {
+            Node? condition = ParseExpression();
+            if (condition == null)
+            {
+                return null;
+            }
+            List<Node>? thenStatements = new List<Node>();
+
+            if (Check(TokenType.LeftBraceToken))
+            {
+                Consume(TokenType.LeftBraceToken, "Expected '{' after if condition.");
+                thenStatements = ParseBlock();
+                if (thenStatements == null)
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                Node? exp = ParseExpression();
+                if (exp == null)
+                {
+                    return null;
+                }
+                thenStatements.Add(exp);
+            }
+
+            List<Node>? elseStatements = null;
+
+            if (Match(TokenType.ElseToken))
+            {
+                if (Check(TokenType.LeftBraceToken))
+                {
+                    Consume(TokenType.LeftBraceToken, "Expected '{' after else keyword.");
+                    elseStatements = ParseBlock();
+                    if (elseStatements == null)
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    elseStatements = new List<Node>();
+                    Node? exp = ParseExpression();
+                    if (exp == null)
+                    {
+                        return null;
+                    }
+                    elseStatements.Add(exp);
+                }
+
+            }
+
+            return new IfNode(condition, thenStatements, elseStatements);
+        }
+        else if (Match(TokenType.FalseToken))
         {
             return new BooleanNode(false);
         }

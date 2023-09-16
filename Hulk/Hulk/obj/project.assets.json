@@ -32,11 +32,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/Hulk.csproj",
+      "projectUniqueName": "/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/Hulk/Hulk.csproj",
       "projectName": "Hulk",
-      "projectPath": "/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/Hulk.csproj",
+      "projectPath": "/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/Hulk/Hulk.csproj",
       "packagesPath": "/Users/franciscoprestamo/.nuget/packages/",
-      "outputPath": "/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/obj/",
+      "outputPath": "/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/Hulk/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/franciscoprestamo/.nuget/NuGet/NuGet.Config"
@@ -52,8 +52,8 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "projectReferences": {
-            "/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/HulkPL/HulkPL.csproj": {
-              "projectPath": "/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/HulkPL/HulkPL.csproj"
+            "/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/HulkPL.csproj": {
+              "projectPath": "/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/HulkPL.csproj"
             }
           }
         }

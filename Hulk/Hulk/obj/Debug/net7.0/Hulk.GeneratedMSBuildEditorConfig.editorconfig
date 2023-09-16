@@ -9,49 +9,49 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = Hulk
 build_property.RootNamespace = Hulk
-build_property.ProjectDir = /Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/
+build_property.ProjectDir = /Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/Hulk/
 build_property.RazorLangVersion = 7.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = /Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk
+build_property.MSBuildProjectDirectory = /Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/Hulk
 build_property._RazorSourceGeneratorDebug = 
 
-[/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/App.razor]
+[/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/Hulk/App.razor]
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/Pages/Editor.razor]
+[/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/Hulk/Pages/Editor.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRWRpdG9yLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/Pages/FetchData.razor]
+[/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/Hulk/Pages/FetchData.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRmV0Y2hEYXRhLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/Pages/Index.razor]
+[/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/Hulk/Pages/Index.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kZXgucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/Shared/SurveyPrompt.razor]
+[/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/Hulk/Shared/SurveyPrompt.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1N1cnZleVByb21wdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/_Imports.razor]
+[/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/Hulk/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/Shared/MainLayout.razor]
+[/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/Hulk/Shared/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL01haW5MYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-gdkjlctmm0
 
-[/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/Shared/NavMenu.razor]
+[/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/Hulk/Shared/NavMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL05hdk1lbnUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-u8ragek663
 
-[/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/Pages/Error.cshtml]
+[/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/Hulk/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/Hulk/Pages/_Host.cshtml]
+[/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/Hulk/Pages/_Host.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvX0hvc3QuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

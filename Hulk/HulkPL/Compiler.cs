@@ -11,7 +11,8 @@ namespace HulkPL
     {
 
 
-        public static string Compile(string code){
+        public static string Compile(string code)
+        {
             string result = "";
 
             var tokens = Lexer.Lex(code);
@@ -29,9 +30,27 @@ namespace HulkPL
             }
 
             Parser parser = new Parser(tokens);
-            Node mainNode = parser.Parse();
+            Node mainNode;
+            try
+            {
+                mainNode = parser.Parse();
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine(e.Message);
+                return e.Message;
+            }
+
             Evaluator evaluator = new Evaluator();
-            result = evaluator.EvaluateMain(mainNode);
+            try
+            {
+                result = evaluator.EvaluateMain(mainNode);
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine(e.Message);
+                return e.Message;
+            }
 
 
             return result;

@@ -10,3 +10,15 @@
 /Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/HulkPL/obj/Debug/net7.0/refint/HulkPL.dll
 /Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/HulkPL/obj/Debug/net7.0/HulkPL.pdb
 /Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/HulkPL/obj/Debug/net7.0/ref/HulkPL.dll
+/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/bin/Debug/net7.0/HulkPL.deps.json
+/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/bin/Debug/net7.0/HulkPL.dll
+/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/bin/Debug/net7.0/HulkPL.pdb
+/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/obj/Debug/net7.0/HulkPL.csproj.AssemblyReference.cache
+/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/obj/Debug/net7.0/HulkPL.GeneratedMSBuildEditorConfig.editorconfig
+/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/obj/Debug/net7.0/HulkPL.AssemblyInfoInputs.cache
+/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/obj/Debug/net7.0/HulkPL.AssemblyInfo.cs
+/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/obj/Debug/net7.0/HulkPL.csproj.CoreCompileInputs.cache
+/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/obj/Debug/net7.0/HulkPL.dll
+/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/obj/Debug/net7.0/refint/HulkPL.dll
+/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/obj/Debug/net7.0/HulkPL.pdb
+/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/obj/Debug/net7.0/ref/HulkPL.dll

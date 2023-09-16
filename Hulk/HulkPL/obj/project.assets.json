@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/HulkPL/HulkPL.csproj",
+      "projectUniqueName": "/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/HulkPL.csproj",
       "projectName": "HulkPL",
-      "projectPath": "/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/HulkPL/HulkPL.csproj",
+      "projectPath": "/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/HulkPL.csproj",
       "packagesPath": "/Users/franciscoprestamo/.nuget/packages/",
-      "outputPath": "/Users/franciscoprestamo/Documents/GitHub/Hulk-IDE/Hulk/HulkPL/obj/",
+      "outputPath": "/Users/franciscoprestamo/Projects/Hulk-IDE/Hulk/HulkPL/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/franciscoprestamo/.nuget/NuGet/NuGet.Config"
