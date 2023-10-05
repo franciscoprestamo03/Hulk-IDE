@@ -1,0 +1,279 @@
+\documentclass{article}
+
+% Load required packages
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{tikz}
+
+% Customize page margins
+\usepackage[margin=2cm]{geometry}
+
+\begin{document}
+
+\title{Compiler Documentation}
+\author{Your Name}
+\date{\today}
+
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduction}
+% Provide an introduction to your compiler, its purpose, and goals.
+
+[Your introduction goes here.]
+
+\newpage
+
+\section{Lexer}
+% Describe the lexer component of your compiler, its role, and how it works.
+
+The lexer component of the compiler performs lexical analysis, which involves breaking the input source code into individual tokens. The lexer reads characters from the input and identifies tokens based on predefined rules. It eliminates any unnecessary whitespace and comments while extracting the meaningful tokens.
+
+\subsection{Tokenization Process}
+% Explain how the lexer reads characters and identifies tokens.
+% You can include a graphic here to illustrate the process.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=1.5, every node/.style={scale=2.5}]
+\node at (-3,0) {Input};
+\node[draw, rectangle] at (0,0) {Lexer};
+\node at (3,0) {Output};
+\draw[->] (-2,0) -- (-1,0);
+\draw[->] (1,0) -- (2,0);
+\end{tikzpicture}
+\caption{Working of a Lexer}
+\end{figure}
+
+\subsection{Token Types}
+The following are the token types defined in the HulkPL namespace:
+\subsubsection{Special Tokens}
+\begin{lstlisting}
+WhiteSpaceToken
+OpenParenToken
+CloseParenToken
+BadToken
+NumberToken
+IdentifierToken
+StringTypeToken
+NumberTypeToken
+EOF
+\end{lstlisting}
+\subsubsection{Keyword Tokens}
+\begin{lstlisting}
+VarToken
+IfToken
+ElseToken
+ForToken
+WhileToken
+DoToken
+SwitchToken
+CaseToken
+BreakToken
+ContinueToken
+DefaultToken
+ReturnToken
+TrueToken
+FalseToken
+NullToken
+LetToken
+InToken
+\end{lstlisting}
+\subsubsection{Operator Tokens}
+\begin{lstlisting}
+AdditionToken
+SubtractionToken
+MultiplicationToken
+DivisionToken
+ModulusToken
+EqualityToken
+InequalityToken
+GreaterThanToken
+GreaterThanOrEqualToken
+LessThanToken
+LessThanOrEqualToken
+LogicalAndToken
+LogicalOrToken
+LogicalNotToken
+SemicolonToken
+LeftParenthesisToken
+RightParenthesisToken
+AssignmentToken
+FunctionToken
+LeftBraceToken
+RightBraceToken
+PrintToken
+QuestionMarkToken
+ColonToken
+CommaToken
+StringToken
+TwoDotsToken
+AssignmentTwoDotsToken
+ArrowToken
+ArrobaToken
+PowToken
+\end{lstlisting}
+
+
+\subsection{Implementation}
+The Lexer class is responsible for tokenizing input text into a list of tokens. It uses regular expressions to match different token patterns. The class contains the following methods:
+\subsubsection{Lex}
+\begin{lstlisting}[language={[Sharp]C}]
+public static List<Token> Lex(string input)
+\end{lstlisting}
+The \texttt{Lex} method is the entry point of the lexer. It takes an input string and returns a list of tokens. It iterates through the input string character by character, building potential tokens until a match is found. If no match is found, it creates a token based on the current token string and moves to the next character. Finally, it adds an end-of-file (EOF) token to mark the end of the input.
+
+\subsubsection{Match}
+\begin{lstlisting}[language={[Sharp]C}]
+private static Tuple<TokenType, string> Match(string input)
+\end{lstlisting}
+The \texttt{Match} method is a helper method used by the lexer to match the current token string against the defined regular expressions. It returns a tuple containing the token type and the matched string. It iterates through the token regexes dictionary, attempts to match the input string with each regex, and returns the corresponding token type if a match is found.
+
+\subsubsection{GetVariableTypeToken}
+\begin{lstlisting}[language={[Sharp]C}]
+private static TokenType GetVariableTypeToken(string input)
+\end{lstlisting}
+The \texttt{GetVariableTypeToken} method is a helper method used to map a variable type string (e.g., "String" or "Number") to the corresponding token type. It returns the token type based on the input string.
+
+\subsubsection{GetKeywordToken}
+\begin{lstlisting}[language={[Sharp]C}]
+private static TokenType GetKeywordToken(string input)
+\end{lstlisting}
+The \texttt{GetKeywordToken} method is a helper method used to map a keyword string (e.g., "if", "else", "function") to the corresponding token type. It returns the token type based on the input string.
+
+\subsubsection{GetOperatorToken}
+\begin{lstlisting}[language={[Sharp]C}]
+private static TokenType GetOperatorToken(string input)
+\end{lstlisting}
+The \texttt{GetOperatorToken} method is a helper method used to map an operator string (e.g., "+", "-", "*", "/") to the corresponding token type. It returns the token type based on the input string.
+
+\subsection{Lexing Example}
+Consider the following example...
+
+\newpage
+
+\section{Parser}
+% Describe the parser component of your compiler, its role, and how it works.
+
+The parser component of the compiler performs syntax analysis on the tokens produced by the lexer. It checks whether the sequence of tokens conforms to the grammar rules of the programming language. The parser uses a parsing technique such as recursive descent parsing or LALR(1) parsing to build a parse tree or an abstract syntax tree (AST) representing the structure of the program.
+
+\subsection{Syntax Analysis}
+% Explain how the parser analyzes the syntax of the input program.
+
+[Explain how the parser analyzes the syntax of the input program.]
+
+\subsection{Abstract Syntax Tree}
+% Discuss the creation and structure of the abstract syntax tree (AST).
+
+[Discuss the creation and structure of the abstract syntax tree (AST).]
+
+
+\subsection{Implementation}
+
+\subsubsection{Constructor}
+\begin{lstlisting}[language={[Sharp]C}]
+public Parser(List<Token> tokens)
+\end{lstlisting}
+
+The constructor initializes the fields:
+
+\begin{itemize}
+\item \texttt{tokens} is set to the passed in list of tokens
+\item \texttt{currentTokenIndex} starts at 0
+\item \texttt{precedence} is initialized with the precedence values for each binary operator
+\end{itemize}
+
+\subsubsection{Parse}
+
+\begin{lstlisting}[language={[Sharp]C}]
+public MainProgramNode Parse()
+\end{lstlisting}
+
+The \texttt{Parse} method is the main entry point. It parses all the tokens and builds the AST:
+\begin{itemize}
+\item It initializes a list to hold the top level statements
+\item It calls \texttt{ParseStatement} in a loop to parse each statement, adding non-null statements to the list
+\item It creates the \texttt{MainProgramNode} root node with the statement list and returns it
+\end{itemize}
+
+
+\subsubsection{ParseStatement}
+
+\begin{lstlisting}[language={[Sharp]C}]
+private Node ParseStatement()
+\end{lstlisting}
+
+The \texttt{ParseStatement} method parses a single statement based on the current token:
+\begin{itemize}
+\item \texttt{PrintStatement} - Parses a print expression statement
+\item \texttt{IfStatement} - Parses an if statement
+\item \texttt{WhileStatement} - Parses a while loop statement
+\item \texttt{FunctionDeclaration} - Parses a function declaration
+\item \texttt{VariableDeclaration} - Parses a variable declaration statement
+\item \texttt{LetStatement} - Parses a let statement
+\item \texttt{Expression} - Parses a standalone expression statement
+\item \texttt{VariableAssignment} - Parses a variable assignment statement
+\end{itemize}
+It returns the parsed statement node or null.
+
+
+\subsubsection{ParseBlock}
+
+\begin{lstlisting}[language={[Sharp]C}]
+private List<Node> ParseBlock()
+\end{lstlisting}
+
+The \texttt{ParseBlock} method parses a block statement delimited by {}. It loops parsing statements until reaching the end brace.
+
+
+\subsubsection{ParseExpression}
+
+\begin{lstlisting}[language={[Sharp]C}]
+private Node ParseExpression()
+\end{lstlisting}
+
+The \texttt{ParseExpression} method is the main entry point for parsing expressions. It delegates to \texttt{ParseBinaryExpression}.
+
+
+\subsubsection{ParseBinaryExpression}
+
+\begin{lstlisting}[language={[Sharp]C}]
+private Node ParseBinaryExpression(int minPrecedence)
+\end{lstlisting}
+
+\texttt{ParseBinaryExpression} recursively parses left-hand side expressions and binary operators based on precedence.
+
+
+\subsubsection{ParseUnaryExpression}
+
+\begin{lstlisting}[language={[Sharp]C}]
+private Node ParseUnaryExpression()
+\end{lstlisting}
+
+\texttt{ParseUnaryExpression} checks for unary - and parses the expression.
+
+
+\subsubsection{ParsePrimaryExpression}
+
+\begin{lstlisting}[language={[Sharp]C}]
+private Node ParsePrimaryExpression()
+\end{lstlisting}
+
+\texttt{ParsePrimaryExpression} parses primitive expressions like literals, grouping.
+
+\subsubsection{Helper Parsing Methods}
+Additional helper methods like \texttt{Consume}, \texttt{Match}, \texttt{Check}, \texttt{Advance} help with parsing logic like verifying expected tokens and advancing the parser.
+
+
+
+
+\section{Conclusion}
+% Provide a concluding section summarizing your compiler's features and future improvements.
+
+[Provide a concluding section summarizing your compiler's features and suggesting possible future improvements.]
+
+\end{document}
