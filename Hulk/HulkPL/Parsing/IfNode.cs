@@ -13,6 +13,18 @@ public class IfNode : Node
         ElseStatements = elseStatements;
     }
 
+    public virtual IEnumerable<Node> GetChildren()
+    {
+        foreach (var item in ThenStatements)
+        {
+            yield return item;
+        }
+        foreach (var item in ElseStatements)
+        {
+            yield return item;
+        }
+    }
+
     public override void Accept(Visitor visitor)
     {
         visitor.VisitIfNode(this);

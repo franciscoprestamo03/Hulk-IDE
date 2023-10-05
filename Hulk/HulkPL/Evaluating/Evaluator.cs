@@ -5,53 +5,67 @@ namespace HulkPL
 {
     public class Evaluator
     {
-        private Stack<Dictionary<string, object>> scopes;
+        public Stack<Dictionary<string, object>> scopes;
 
-        private Stack<Dictionary<string, FunctionDeclarationNode>> functionScopes;
-        private string output;
+        public Stack<Dictionary<string, FunctionDeclarationNode>> functionScopes;
+        public string output;
+        public int whileIterations;
 
+        public int iterations;
+
+        private int Counter;
         public Evaluator()
         {
+            Counter = 0;
+            whileIterations = 0;
             output = "";
             this.scopes = new Stack<Dictionary<string, object>>();
             this.scopes.Push(new Dictionary<string, object>());
             this.functionScopes = new Stack<Dictionary<string, FunctionDeclarationNode>>();
             this.functionScopes.Push(new Dictionary<string, FunctionDeclarationNode>());
-
-            //declaring some of my natives functions of like sen(x) and cos(x) for the hulk example tan(x)
-            //List<VariableDeclarationNode> variablesExample = new List<VariableDeclarationNode>();
-            //variablesExample.Add(new VariableDeclarationNode("x",null));
-            //FunctionDeclarationNode sen = new FunctionDeclarationNode("sen",variablesExample,null, new NumberNode(Math.Sin(double.Parse(sen.Pa))));
-
         }
 
-        public string EvaluateMain(Node node){
+        public string EvaluateMain(MainProgramNode node)
+        {
             output = "";
-
+            iterations = 1;
+            System.Console.WriteLine(iterations++);
             Evaluate(node);
 
             return output;
         }
         public object? Evaluate(Node node)
         {
+            Counter++;
+            if(Counter>80){
+                throw new Exception("Hulk Stack Overflow");
+            }
+            Dictionary<string, FunctionDeclarationNode> scope;
             switch (node)
             {
                 case MainProgramNode mainNode:
                     EnterScope();
                     object result = EvaluateBlock(mainNode.Body);
                     ExitScope();
+                    Counter--;
                     return result;
                 case BinaryExpressionNode binaryExpressionNode:
+                    Counter--;
                     return EvaluateBinaryExpression(binaryExpressionNode);
                 case UnaryExpressionNode unaryExpressionNode:
+                    Counter--;
                     return EvaluateUnaryExpression(unaryExpressionNode);
                 case GroupingNode groupingNode:
+                    Counter--;
                     return Evaluate(groupingNode.Expression);
                 case NumberNode numberNode:
+                    Counter--;
                     return numberNode.Value;
                 case StringNode stringNode:
+                    Counter--;
                     return stringNode.Value;
                 case BooleanNode booleanNode:
+                    Counter--;
                     return booleanNode.Value;
                 case FunctionDeclarationNode functionDeclarationNode:
                     if (functionScopes.Peek().ContainsKey(functionDeclarationNode.Name))
@@ -62,69 +76,91 @@ namespace HulkPL
                     else
                     {
                         functionScopes.Peek().Add(functionDeclarationNode.Name, functionDeclarationNode);
+                        Counter--;
                         return null;
                     }
                 case FunctionCallNode functionCallNode:
-                    if(functionCallNode.Name == "sin"){
+                    if (functionCallNode.Name == "sin")
+                    {
                         var argument1 = Evaluate(functionCallNode.Arguments[0]);
-                        if(argument1 is Double){
+                        if (argument1 is Double)
+                        {   
+                            Counter--;
                             return Math.Sin((double)argument1);
                         }
-                        else{
+                        else
+                        {
                             output += $"Function sen(x) receive a double not a {argument1.GetType()}";
                             throw new Exception($"Function sen(x) receive a double not a {argument1.GetType()}");
                         }
                     }
-                    else if(functionCallNode.Name == "cos"){
+                    else if (functionCallNode.Name == "cos")
+                    {
                         var argument1 = Evaluate(functionCallNode.Arguments[0]);
-                        if(argument1 is Double){
+                        if (argument1 is Double)
+                        {
+                            Counter--;
                             return Math.Cos((double)argument1);
                         }
-                        else{
+                        else
+                        {
                             output += $"Function cos(x) receive a double not a {argument1.GetType()}";
                             throw new Exception($"Function cos(x) receive a double not a {argument1.GetType()}");
                         }
                     }
-                    else if(functionCallNode.Name == "print"){
+                    else if (functionCallNode.Name == "print")
+                    {
+                        System.Console.WriteLine("Function print");
                         object? value2 = null;
                         foreach (Node argument in functionCallNode.Arguments)
                         {
                             value2 = Evaluate(argument);
-                            Console.Write("value => "+value2);
+                            Console.WriteLine("value => " + value2);
                             output += $"{value2}";
-                            
+
                         }
+                        System.Console.WriteLine("Out Function print");
+                        Counter--;
                         return value2;
                     }
-                    else if(functionCallNode.Name == "printLine"){
+                    else if (functionCallNode.Name == "printLine")
+                    {
+                        System.Console.WriteLine("Function printLine");
                         object? value3 = null;
                         foreach (Node argument in functionCallNode.Arguments)
                         {
                             value3 = Evaluate(argument);
-                            Console.WriteLine("value => "+value3);
+                            Console.WriteLine("value => " + value3);
                             output += $"{value3}\n";
-                            
+
                         }
+                        Counter--;
                         return value3;
                     }
-                    else if (FindFuntionScope(functionCallNode.Name) != null)
+                    else if ((scope = FindFuntionScope(functionCallNode.Name)) != null)
                     {
-                        FunctionDeclarationNode function = FindFuntionScope(functionCallNode.Name)[functionCallNode.Name];
+                        
+                        FunctionDeclarationNode function = scope[functionCallNode.Name];
+
                         EnterScope();
-                        if(function.Parameters.Count!=functionCallNode.Arguments.Count){
-                            output += $"Function requires exact {function.Parameters.Count} arguments";
+
+                        if (function.Parameters.Count != functionCallNode.Arguments.Count)
+                        {
                             throw new Exception($"Function requires exact {function.Parameters.Count} arguments");
                         }
                         for (int i = 0; i < function.Parameters.Count; i++)
                         {
                             VariableDeclarationNode variableDeclaration = function.Parameters[i];
                             variableDeclaration.Initializer = functionCallNode.Arguments[i];
+
                             Evaluate(variableDeclaration);
                         }
-                        object? result4 =  function.Body != null ? EvaluateBlock(function.Body) : null;
-                        
-                        object? result5 = function.ReturnNode != null ? Evaluate(function.ReturnNode) : null;
+                        object? result4 = function.Body!=null? EvaluateBlock(function.Body):null;
+
+                        object? result5 = Evaluate(function.ReturnNode);
+
                         ExitScope();
+                        Counter--;
                         return result5;
                     }
                     else
@@ -135,6 +171,7 @@ namespace HulkPL
                 case VariableReferenceNode variableReferenceNode:
                     if (FindVariableScope(variableReferenceNode.Name) != null)
                     {
+                        Counter--;
                         return FindVariableScope(variableReferenceNode.Name)[variableReferenceNode.Name];
                     }
                     else
@@ -153,22 +190,19 @@ namespace HulkPL
                         object initialValue = Evaluate(variableDeclarationNode.Initializer);
 
                         //type cheking
-                        System.Console.WriteLine("verificando valor "+initialValue.GetType());
+                        System.Console.WriteLine($"verificando valor {initialValue.GetType()} {initialValue}");
 
-                        if(variableDeclarationNode.VarType==VariableType.Implicit){
-                            if(initialValue.GetType()=="a".GetType()){
-                                
-                            }
-                        }
 
                         scopes.Peek().Add(variableDeclarationNode.Name, initialValue);
-                        return null;
+                        Counter--;
+                        return initialValue;
                     }
                 case VariableAssignmentNode variableAssignmentNode:
                     if (FindVariableScope(variableAssignmentNode.Name) != null)
                     {
                         object? valueToAssign = Evaluate(variableAssignmentNode.Value);
                         FindVariableScope(variableAssignmentNode.Name)[variableAssignmentNode.Name] = valueToAssign;
+                        Counter--;
                         return null;
                     }
                     else
@@ -184,28 +218,44 @@ namespace HulkPL
                         EnterScope();
                         object result1 = EvaluateBlock(ifNode.ThenStatements);
                         ExitScope();
+                        Counter--;
                         return result1;
+                        
                     }
                     else if (ifNode.ElseStatements != null)
                     {
                         EnterScope();
                         object result2 = EvaluateBlock(ifNode.ElseStatements);
                         ExitScope();
+                        Counter--;
                         return result2;
                     }
                     else
                     {
+                        Counter--;
                         return null;
                     }
                 case WhileNode whileNode:
                     object? loopConditionValue = Evaluate(whileNode.Condition);
                     while (loopConditionValue is bool loopConditionBool && loopConditionBool)
                     {
+                        if (whileIterations == 100000)
+                        {
+                            throw new Exception("Hulk Stack overflow");
+                        }
+                        else
+                        {
+                            whileIterations++;
+                        }
                         EnterScope();
+                        System.Console.WriteLine("before " + iterations++);
                         EvaluateBlock(whileNode.BodyStatements);
+                        System.Console.WriteLine("after " + iterations++);
                         ExitScope();
                         loopConditionValue = Evaluate(whileNode.Condition);
                     }
+                    whileIterations = 0;
+                    Counter--;
                     return null;
                 case LetNode letNode:
                     EnterScope();
@@ -215,13 +265,26 @@ namespace HulkPL
                     }
                     object result3 = EvaluateBlock(letNode.Body);
                     ExitScope();
+                    Counter--;
                     return result3;
                 default:
-                    output += $"Unhandled node type: {node.GetType()}";
-                    throw new Exception($"Unhandled node type: {node.GetType()}");
+                    throw new Exception($"Unhandled node type: {node}");
             }
         }
 
+       
+        private Dictionary<string, FunctionDeclarationNode> FindFuntionScope(string functionName)
+        {
+            foreach (Dictionary<string, FunctionDeclarationNode> scope in functionScopes)
+            {
+                if (scope.ContainsKey(functionName))
+                {
+                    return scope;
+                }
+            }
+
+            return null;
+        }
         private Dictionary<string, object> FindVariableScope(string variableName)
         {
             foreach (Dictionary<string, object> scope in scopes)
@@ -234,42 +297,21 @@ namespace HulkPL
 
             // If the variable is not found in the local scope,
             // recursively search in the parent scope (the previous scope in the stack).
-            if (scopes.Count > 1)
-            {
-                scopes.Pop();
-                Dictionary<string, object> parentScope = FindVariableScope(variableName);
-                scopes.Push(parentScope);
-                return parentScope;
-            }
+            // if (scopes.Count > 1)
+            // {
+            //     scopes.Pop();
+            //     Dictionary<string, object> parentScope = FindVariableScope(variableName);
+            //     scopes.Push(parentScope);
+            //     return parentScope;
+            // }
 
             return null;
         }
 
-        private Dictionary<string, FunctionDeclarationNode> FindFuntionScope(string functionName)
-        {
-            foreach (Dictionary<string, FunctionDeclarationNode> scope in functionScopes)
-            {
-                if (scope.ContainsKey(functionName))
-                {
-                    return scope;
-                }
-            }
-
-            // If the variable is not found in the local scope,
-            // recursively search in the parent scope (the previous scope in the stack).
-            if (functionScopes.Count > 1)
-            {
-                functionScopes.Pop();
-                Dictionary<string, FunctionDeclarationNode> parentScope = FindFuntionScope(functionName);
-                functionScopes.Push(parentScope);
-                return parentScope;
-            }
-
-            return null;
-        }
 
         private void EnterScope()
         {
+            System.Console.WriteLine($"Entering scope {scopes.Count}");
             this.scopes.Push(new Dictionary<string, object>());
             //se puede eliminar para que todas las funciones que se declaren sean globales
             this.functionScopes.Push(new Dictionary<string, FunctionDeclarationNode>());
@@ -279,10 +321,12 @@ namespace HulkPL
         {
             this.scopes.Pop();
             this.functionScopes.Pop();
+            System.Console.WriteLine($"Exit scope {scopes.Count}");
         }
 
         private object EvaluateBinaryExpression(BinaryExpressionNode node)
         {
+
             object left = Evaluate(node.Left);
             object right = Evaluate(node.Right);
 
@@ -331,6 +375,33 @@ namespace HulkPL
                     {
                         output += $"Cannot divide {left?.GetType().Name} and {right?.GetType().Name}";
                         throw new Exception($"Cannot divide {left?.GetType().Name} and {right?.GetType().Name}");
+                    }
+                case TokenType.ArrobaToken:
+                    if(left != null && right != null){
+                        return left.ToString()+right.ToString();
+                    }
+                    else{
+                        throw new Exception($"Cannot concatenate {left?.GetType().Name} and {right?.GetType().Name}");
+                    }
+                case TokenType.ModulusToken:
+                    if (left is double leftDoubleMod && right is double rightDoubleMod)
+                    {
+                        return leftDoubleMod % rightDoubleMod;
+                    }
+                    else
+                    {
+                        
+                        throw new Exception($"Cannot apply modulus to {left?.GetType().Name} and {right?.GetType().Name}");
+                    }
+                case TokenType.PowToken:
+                    if (left is double leftDoublePow && right is double rightDoublePow)
+                    {
+                        return Math.Pow(leftDoublePow,rightDoublePow);
+                    }
+                    else
+                    {
+                        
+                        throw new Exception($"Cannot apply exponenciation to {left?.GetType().Name} and {right?.GetType().Name}");
                     }
                 case TokenType.EqualityToken:
                     return left.Equals(right);
@@ -404,6 +475,7 @@ namespace HulkPL
 
         private object EvaluateUnaryExpression(UnaryExpressionNode node)
         {
+
             object operand = Evaluate(node.Expression);
 
             switch (node.Operator.Type)
@@ -435,6 +507,7 @@ namespace HulkPL
 
         private object EvaluateBlock(List<Node> statements)
         {
+
             object result = null;
             foreach (Node statement in statements)
             {

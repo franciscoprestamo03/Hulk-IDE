@@ -64,5 +64,7 @@ namespace HulkPL
         TwoDotsToken,
         AssignmentTwoDotsToken,
         ArrowToken,
+        ArrobaToken,
+        PowToken,
     }
 }

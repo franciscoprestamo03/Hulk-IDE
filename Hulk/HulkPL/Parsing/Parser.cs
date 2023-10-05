@@ -22,12 +22,15 @@ public class Parser
             { TokenType.GreaterThanOrEqualToken, 2 },
             { TokenType.AdditionToken, 3 },
             { TokenType.SubtractionToken, 3 },
+            { TokenType.ArrobaToken,3},
             { TokenType.MultiplicationToken, 4 },
             { TokenType.DivisionToken, 4 },
+            { TokenType.PowToken,5},
+            { TokenType.ModulusToken,5},
         };
     }
 
-    public Node Parse()
+    public MainProgramNode Parse()
     {
         List<Node> statements = new List<Node>();
         while (!IsAtEnd())
@@ -195,6 +198,9 @@ public class Parser
             Consume(TokenType.RightBraceToken, "Expected '}' after block.");
 
             Console.WriteLine(returnNode);
+            if(returnNode == null){
+                throw new Exception("Expected return in a function declaration");
+            }
             return new FunctionDeclarationNode(functionName.Value, variables, body, returnNode);
         }
         else if (Match(TokenType.VarToken))
@@ -286,10 +292,13 @@ public class Parser
             } while (Match(TokenType.CommaToken));
 
             Consume(TokenType.InToken, "Expected 'in' keyword after let bindings.");
-            Consume(TokenType.LeftBraceToken, "Expected '{' after while condition.");
-            List<Node> body = ParseBlock();
-
-
+            List<Node> body = new List<Node>();
+            if(Match(TokenType.LeftBraceToken)){
+                body = ParseBlock();
+            }else{
+                body.Add(ParseExpression());
+                Consume(TokenType.SemicolonToken, "Expected ';' after variable declaration.");
+            }
 
             return new LetNode(variables, body);
         }
@@ -358,6 +367,11 @@ public class Parser
             Node expr = ParseUnaryExpression();
             return new UnaryExpressionNode(op, expr);
         }
+        else if (Match(TokenType.LogicalNotToken)){
+            Token op = Previous();
+            Node expr = ParseUnaryExpression();
+            return new UnaryExpressionNode(op, expr);
+        }
         else
         {
             return ParsePrimaryExpression();
@@ -366,6 +380,7 @@ public class Parser
 
     private Node ParsePrimaryExpression()
     {
+        
         if (Match(TokenType.IfToken))
         {
             Node? condition = ParseExpression();
@@ -396,6 +411,7 @@ public class Parser
 
             List<Node>? elseStatements = null;
 
+            
             if (Match(TokenType.ElseToken))
             {
                 if (Check(TokenType.LeftBraceToken))
@@ -421,6 +437,70 @@ public class Parser
             }
 
             return new IfNode(condition, thenStatements, elseStatements);
+        }
+        else if (Match(TokenType.LetToken))
+        {
+            List<Node> variables = new List<Node>();
+            List<Node> initializers = new List<Node>();
+
+            do
+            {
+                Node expr = ParseExpression();
+
+                VariableType variableType = VariableType.Implicit;
+
+                if (Check(TokenType.TwoDotsToken))
+                {
+                    Advance();
+                    if (Check(TokenType.StringTypeToken))
+                    {
+                        variableType = VariableType.String;
+                        Advance();
+                    }
+                    else if (Check(TokenType.NumberTypeToken))
+                    {
+                        variableType = VariableType.Number;
+                        Advance();
+                    }
+                    else
+                    {
+                        throw new Exception("Expected variable type after : ");
+                    }
+                }
+
+
+                if (Match(TokenType.AssignmentToken))
+                {
+                    Node right = ParseExpression();
+
+                    variables.Add(new VariableDeclarationNode(((VariableReferenceNode)expr).Name, right, variableType));
+                }
+                else
+                {
+                    throw new Exception("Expected assignation value after variable");
+                }
+                /*
+                if (Match(TokenType.AssignmentToken))
+                {
+                    Node initializer = ParseExpression();
+                    initializers.Add(initializer);
+                }
+                */
+
+
+            } while (Match(TokenType.CommaToken));
+
+            Consume(TokenType.InToken, "Expected 'in' keyword after let bindings.");
+            List<Node> body = new List<Node>();
+            if(Match(TokenType.LeftBraceToken)){
+                body = ParseBlock();
+            }else{
+                body.Add(ParseExpression());
+                //let as expresion for example in a variable declaration does not need ;
+                //Consume(TokenType.SemicolonToken, "Expected ';' after variable declaration.");
+            }
+
+            return new LetNode(variables, body);
         }
         else if (Match(TokenType.FalseToken))
         {
@@ -468,7 +548,7 @@ public class Parser
         }
         else
         {
-            throw new Exception("Expected expression." + Peek().Type);
+            throw new Exception("Expected expression but get " + Peek().Type + " ("+Peek().Value+")");
         }
     }
 

@@ -8,14 +8,14 @@ class Lexer
 
     private static readonly Dictionary<TokenGroup, Regex> tokenRegexes = new Dictionary<TokenGroup, Regex> {
         { TokenGroup.Keyword, new Regex(@"^(let|var|if|else|for|while|return|function|in|true|false)$") },
-        {TokenGroup.VariablesTypes,new Regex(@"^(String|Number)$") },
+        { TokenGroup.VariablesTypes,new Regex(@"^(String|Number)$") },
         { TokenGroup.Variable, new Regex(@"^[_a-zA-Z][_a-zA-Z0-9]*$") },
-        { TokenGroup.Operator, new Regex(@"^(\:|\;|\(|\)|\+|\-|\*|\/|\==|\!=|\=|\?|\,|\{|\}|\:\=|\>\=|\>|\=\>|\|\||&&)$") },
+        { TokenGroup.Operator, new Regex(@"^(\:|\;|\(|\)|\+|\-|\*|\/|\=\=|\!=|\!|\=|\?|\,|\{|\}|\:\=|\>\=|\>|\=\>|\<|\<\=|\|\||&&|\@|\^)$") },
         { TokenGroup.WhiteSpace, new Regex(@"^\s+$") },
-        { TokenGroup.Number, new Regex(@"^\d+(\.\d+)?$") },
+        { TokenGroup.Number, new Regex(@"^(\d+\.?\d*)$") },
         { TokenGroup.StringGroup, new Regex(@"^"".*?""$") },
         { TokenGroup.BadStringGroup,new Regex(@"^(""|"".*)$")},
-
+        {TokenGroup.Porcent, new Regex(@"^(%)$")},
     };
 
     public static List<Token> Lex(string input)
@@ -29,9 +29,10 @@ class Lexer
             var currentChar = remainingText[0].ToString();
             remainingText = remainingText.Substring(1);
 
+            
+
             var potentialToken = currentToken + currentChar;
             var matchedToken = false;
-            
             if (tokenRegexes[TokenGroup.BadStringGroup].IsMatch(currentToken) && currentChar == "\"")
             {
 
@@ -55,6 +56,8 @@ class Lexer
                 tokens.Add(new Token(tokenType, currentToken));
                 currentToken = currentChar;
             }
+
+            
         }
 
         if (!string.IsNullOrEmpty(currentToken))
@@ -95,12 +98,14 @@ class Lexer
                         return Tuple.Create(TokenType.StringToken, match.Value);
                     case TokenGroup.BadStringGroup:
                         throw new Exception("Invalid string declaration   " + match.Value);
+                    case TokenGroup.Porcent:
+                        return Tuple.Create(TokenType.ModulusToken, match.Value);
                     default:
                         break;
                 }
             }
         }
-        return Tuple.Create(TokenType.BadToken, input);
+        throw new Exception("Invalid token "+ input);
     }
 
     private static TokenType GetVariableTypeToken(string input)
@@ -112,7 +117,7 @@ class Lexer
             case "Number":
                 return TokenType.NumberTypeToken;
         }
-        return TokenType.BadToken;
+        throw new Exception("Invalid token "+ input);
     }
 
     private static TokenType GetKeywordToken(string input)
@@ -156,7 +161,7 @@ class Lexer
             case "in":
                 return TokenType.InToken;
         }
-        return TokenType.BadToken;
+        throw new Exception("Invalid token "+ input);
     }
 
     private static TokenType GetOperatorToken(string input)
@@ -179,8 +184,6 @@ class Lexer
                 return TokenType.MultiplicationToken;
             case "/":
                 return TokenType.DivisionToken;
-            case "%":
-                return TokenType.ModulusToken;
             case "=":
                 return TokenType.AssignmentToken;
             case "==":
@@ -213,9 +216,13 @@ class Lexer
                 return TokenType.RightBraceToken;
             case "=>":
                 return TokenType.ArrowToken;
+            case "@":
+                return TokenType.ArrobaToken;
+            case "^":
+                return TokenType.PowToken;
 
         }
-        return TokenType.BadToken;
+        throw new Exception("Invalid token "+ input);
     }
 }
 
